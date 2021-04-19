@@ -27,3 +27,8 @@ $ sudo systemctl status postgresql.service
 
 $ psql -c "alter user postgres with password 'postgres'"
 $ createdb charting_library -O postgres
+
+$ pip install -r requirements.txt
+$ python manage.py migrate
+$ python manage.py runserver 0.0.0.0:8000
+$ gunicorn --bind 0.0.0.0:8000
