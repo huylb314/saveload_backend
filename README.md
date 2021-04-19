@@ -15,3 +15,15 @@ Python 3x, pip, Django, Postgresql
 5. Run `python manage.py migrate`. This will create database schema without any data.
 6. Run `python manage.py runserver` to run *TEST* instance of your database. Use some other stuff (i.e., Gunicorn) for your production environment.
 
+
+## Setup Sever
+$ sudo apt update
+$ sudo apt install postgresql postgresql-contrib
+$ sudo apt install postgresql postgresql-client
+$ sudo systemctl stop postgresql.service
+$ sudo systemctl start postgresql.service
+$ sudo systemctl enable postgresql.service
+$ sudo systemctl status postgresql.service
+
+$ psql -c "alter user postgres with password 'postgres'"
+$ createdb charting_library -O postgres
