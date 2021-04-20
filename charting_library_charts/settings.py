@@ -1,6 +1,9 @@
 # Django settings for charting_library_charts project.
 
 import os
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
@@ -57,15 +60,15 @@ MEDIA_ROOT = ''
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
 MEDIA_URL = ''
 
+# URL prefix for static files.
+# Example: "http://media.lawrence.com/static/"
+STATIC_URL = '/static/'
+
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = ''
-
-# URL prefix for static files.
-# Example: "http://media.lawrence.com/static/"
-STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 # Additional locations of static files
 # STATICFILES_DIRS = (
@@ -73,8 +76,8 @@ STATIC_URL = '/static/'
 # 	# Always use forward slashes, even on Windows.
 # 	# Don't forget to use absolute paths, not relative paths.
 # )
-
-STATICFILES_DIRS = '/static/'
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # List of finder classes that know how to find static files in
 # various locations.
