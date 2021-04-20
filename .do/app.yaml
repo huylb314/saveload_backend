@@ -20,7 +20,7 @@ jobs:
 - name: migrate
   kind: PRE_DEPLOY
   github:
-    repo: digitalocean/sample-django
+    repo: huylb314/saveload_backend
     branch: static
     deploy_on_push: true
   run_command: python manage.py migrate
@@ -34,7 +34,7 @@ jobs:
 static_sites:
 - name: static
   github:
-    repo: digitalocean/sample-django
+    repo: huylb314/saveload_backend
     branch: static
     deploy_on_push: true
   # This happens as part of the Python/DJango buildpack:
