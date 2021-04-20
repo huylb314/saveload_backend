@@ -1,9 +1,7 @@
 # Django settings for charting_library_charts project.
 
-from pathlib import Path
 import os
 
-BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
@@ -68,16 +66,13 @@ STATIC_ROOT = ''
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 # Additional locations of static files
-# STATICFILES_DIRS = (
-# 	# Put strings here, like "/home/html/static" or "C:/www/django/static".
-# 	# Always use forward slashes, even on Windows.
-# 	# Don't forget to use absolute paths, not relative paths.
-# )
-
-STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
+STATICFILES_DIRS = (
+	# Put strings here, like "/home/html/static" or "C:/www/django/static".
+	# Always use forward slashes, even on Windows.
+	# Don't forget to use absolute paths, not relative paths.
+)
 
 # List of finder classes that know how to find static files in
 # various locations.

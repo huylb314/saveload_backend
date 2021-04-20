@@ -32,3 +32,5 @@ $ pip install -r requirements.txt
 $ python manage.py migrate
 $ python manage.py runserver 0.0.0.0:8000
 $ gunicorn --bind 0.0.0.0:8000
+
+$ gunicorn --env DJANGO_SETTINGS_MODULE=charting_library_charts.settings
