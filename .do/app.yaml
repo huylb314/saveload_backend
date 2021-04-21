@@ -1,11 +1,26 @@
-name: saveload_backend
+name: saveload-backend
 services:
 - name: server
   github:
     repo: huylb314/saveload_backend
-    branch: main
+    branch: master
     deploy_on_push: true
   run_command: gunicorn --worker-tmp-dir /dev/shm --config gunicorn_config.py charting_library_charts.wsgi
+  envs:
+  - key: DISABLE_COLLECTSTATIC
+    value: "1"
+    scope: BUILD_TIME
+  - key: DATABASE_URL
+    value: "${db.DATABASE_URL}"
+    scope: RUN_TIME
+jobs:
+- name: migrate
+  kind: PRE_DEPLOY
+  github:
+    repo: huylb314/saveload_backend
+    branch: master
+    deploy_on_push: true
+  run_command: python manage.py migrate
   envs:
   - key: DISABLE_COLLECTSTATIC
     value: "1"
