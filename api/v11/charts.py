@@ -6,6 +6,15 @@ from datetime import datetime
 from model import models
 from api.v11 import common
 
+userList = {
+  "huylb314": "607dd570316d3700355b8c4d",
+  "huylhv": "607dd73e316d3700355b8c4e",
+  "quannh": "607dd74d316d3700355b8c4f",
+  "hoangvm": "60828885316d3700355b8c50",
+  "test1": "60c5fa61ac54ec0034c014eb",
+  "test2": "60c5fa68ac54ec0034c014ec",
+}
+useridList = {v: k for k, v in userList.items()}
 
 def processRequest(request):
 	parsedRequest = common.parseRequest(request)
@@ -39,10 +48,27 @@ def processRequest(request):
 		symbol = request.POST.get('symbol')
 		resolution = request.POST.get('resolution')
 		content = request.POST.get('content')
-		if chartId == '':
-			return saveChart(clientId, userId, chartName, symbol, resolution, content)
+		if '|' in chartName:
+			splittedName, receivedName = chartName.split('|')
+			symbol = request.POST.get('symbol')
+			resolution = request.POST.get('resolution')
+			content = request.POST.get('content')
+			if receivedName in userList:
+				receivedUserId = userList[receivedName]
+				if not (userId == receivedUserId):
+					sharedName = useridList[userId]
+					sharedChartName = "{}-{}-{}".format(splittedName, sharedName, datetime.now().strftime("%H:%M:%S"))
+					sharedContent = content.replace(chartName, sharedChartName)
+					saveChart(clientId, receivedUserId, sharedChartName, symbol, resolution, sharedContent)
+			if chartId == '':
+				return saveChart(clientId, userId, chartName, symbol, resolution, content)
+			else:
+				return rewriteChart(clientId, userId, chartId, chartName, symbol, resolution, content)
 		else:
-			return rewriteChart(clientId, userId, chartId, chartName, symbol, resolution, content)
+			if chartId == '':
+				return saveChart(clientId, userId, chartName, symbol, resolution, content)
+			else:
+				return rewriteChart(clientId, userId, chartId, chartName, symbol, resolution, content)
 
 	else:
 		return common.error('Wrong request')
