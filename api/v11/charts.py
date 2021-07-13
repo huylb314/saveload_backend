@@ -56,22 +56,23 @@ def processRequest(request):
 			content = request.POST.get('content')
 			sharedUserId = None
 			sharedChartId = None
+			sharedChartName = None
 			if receivedName in userList:
 				sharedUserId = userList[receivedName]
-				if not (userId == sharedUserId):
-					sharedName = useridList[userId]
-					sharedChartName = "{}-{}-{}".format(splittedName, sharedName, datetime.now().strftime("%H:%M:%S"))
-					sharedContent = content.replace(chartName, sharedChartName)
-					sharedChartId = saveChart(clientId, sharedUserId, sharedChartName, symbol, resolution, sharedContent, [], [], True)
+			if not (userId == sharedUserId):
+				sharedName = useridList[userId]
+				sharedChartName = "{}-{}".format(splittedName, sharedName)
 			if chartId == '':
+				sharedContent = content.replace(chartName, sharedChartName)
+				sharedChartId = saveChart(clientId, sharedUserId, sharedChartName, symbol, resolution, sharedContent, [], [], True)
 				return saveChart(clientId, userId, chartName, symbol, resolution, content, [sharedUserId], [sharedChartId], False)
 			else:
-				return rewriteChart(clientId, userId, chartId, chartName, symbol, resolution, content, [sharedUserId], [sharedChartId])
+				return rewriteChart(clientId, userId, chartId, chartName, symbol, resolution, content, sharedUserId, sharedChartId, sharedChartName)
 		else:
 			if chartId == '':
 				return saveChart(clientId, userId, chartName, symbol, resolution, content, [], [], False)
 			else:
-				return rewriteChart(clientId, userId, chartId, chartName, symbol, resolution, content, [], [])
+				return rewriteChart(clientId, userId, chartId, chartName, symbol, resolution, content, None, None, None)
 
 	else:
 		return common.error('Wrong request')
@@ -127,7 +128,7 @@ def saveChart(clientId, userId, chartName, symbol, resolution, content, sharedUs
 		return newChart.id
 	return common.response(json.dumps({'status': 'ok', 'id': newChart.id}))
 
-def rewriteChart(clientId, userId, chartId, chartName, symbol, resolution, content, sharedUserId=[], sharedChartId=[]):
+def rewriteChart(clientId, userId, chartId, chartName, symbol, resolution, content, sharedUserId=None, sharedChartId=None, sharedChartName=None):
 	try:
 		chart = models.Chart.objects.get(ownerSource = clientId, ownerId = userId, id = chartId)
 		chart.lastModified = datetime.now()
@@ -135,8 +136,18 @@ def rewriteChart(clientId, userId, chartId, chartName, symbol, resolution, conte
 		chart.name = chartName
 		chart.symbol = symbol
 		chart.resolution = resolution
-		chart.sharedUserId.extend(sharedUserId)
-		chart.sharedChartId.extend(sharedChartId)
+
+		if (sharedUserId and sharedChartId) and (sharedUserId not in chart.sharedUserId) and (sharedChartId not in chart.sharedChartId):
+			chart.sharedUserId.append(sharedUserId)
+			chart.sharedChartId.append(sharedChartId)
+		if sharedChartName and len(chart.sharedUserId) > 0 and len(chart.sharedChartId) > 0:
+			for childUserId, childChartId in zip(chart.sharedUserId, chart.sharedChartId):
+				chartChild = models.Chart.objects.get(ownerSource = clientId, ownerId = childUserId, id = childChartId)
+				sharedContent = content.replace(chartName, sharedChartName)
+				chartChild.lastModified = datetime.now()
+				chartChild.content = sharedContent
+				chartChild.name = sharedChartName
+				chartChild.save()
 
 		chart.save()
 		return common.response(json.dumps({'status': 'ok'}))
